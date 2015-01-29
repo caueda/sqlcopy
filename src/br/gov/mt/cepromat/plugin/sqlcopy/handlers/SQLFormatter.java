@@ -110,9 +110,10 @@ public class SQLFormatter extends AbstractHandler {
 			}
 			//System.out.println(l.replace("sql.append(\"", ""));
 			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");
-			String firstPart = linha.replaceAll("\\s*(.)*\\.append(\\s)*\\((\\s)*\""," ");
+			String firstPart = linha.replaceAll("\\s*.+\\.append\\s*\\(\\s*"," ").replaceAll("\"$", "");
 			//System.out.println(firstPart);			
-			formatado.append(firstPart.replaceAll("\"\\s*\\)\\s*;$", " "));
+			firstPart = removeStringPart(firstPart.replaceAll("\"\\s*\\)\\s*;$", " "));
+			formatado.append(firstPart);
 		}
 		return formatado.toString();
 	}
@@ -125,7 +126,7 @@ public class SQLFormatter extends AbstractHandler {
 				linha = linha.replaceAll("\\s*(String)\\s*.+\\s*=\\s*","").replaceAll("new\\s+String\\(","");
 				linha = linha.replaceAll("\\)\\s*;$","");				
 			}
-			linha = linha.replaceAll("\\)\\s*;","");
+			linha = linha.replaceAll("\\)\\s*;","").replaceAll("\\s*\\+", "");
 			linha = linha.replace("\\n","").replace("\\r", "").replace("\n", "").replace("\r", "");
 			linha = linha.replaceAll("\\+*\\s*\"","").replaceAll("\\s*\"\\s*;$", "");
 			resultado.append(linha).append("\n");
