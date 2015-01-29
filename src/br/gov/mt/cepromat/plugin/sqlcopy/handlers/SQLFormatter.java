@@ -2,10 +2,7 @@ package br.gov.mt.cepromat.plugin.sqlcopy.handlers;
 
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.UnsupportedFlavorException;
-import java.io.IOException;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -106,6 +103,11 @@ public class SQLFormatter extends AbstractHandler {
 		StringBuilder formatado = new StringBuilder();
 		String[] linhas = sql.split("\n");
 		for(String linha : linhas){
+			if(linha.contains("StringBuilder") || linha.contains("StringBuffer")){
+				linha = linha.replaceAll("StringBuilder\\s*\\(", "").replaceAll("\\s*\\)\\s*;$", "");
+				linha = linha.replaceAll("(StringBuilder|StringBuffer)\\s+.+\\s+=\\s+new\\s+", "");
+				linha = linha.replace("\"","");
+			}
 			//System.out.println(l.replace("sql.append(\"", ""));
 			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");
 			String firstPart = linha.replaceAll("\\s*(.)*\\.append(\\s)*\\((\\s)*\""," ");
@@ -116,8 +118,18 @@ public class SQLFormatter extends AbstractHandler {
 	}
 	
 	public String removeStringPart(String sql){
-		String resultado = "";
-		
-		return resultado;
+		StringBuilder resultado = new StringBuilder();
+		String[] linhas = sql.split("\n");
+		for(String linha : linhas){
+			if(linha.contains("String")){
+				linha = linha.replaceAll("\\s*(String)\\s*.+\\s*=\\s*","").replaceAll("new\\s+String\\(","");
+				linha = linha.replaceAll("\\)\\s*;$","");				
+			}
+			linha = linha.replaceAll("\\)\\s*;","");
+			linha = linha.replace("\\n","").replace("\\r", "").replace("\n", "").replace("\r", "");
+			linha = linha.replaceAll("\\+*\\s*\"","").replaceAll("\\s*\"\\s*;$", "");
+			resultado.append(linha).append("\n");
+		}
+		return resultado.toString();
 	}
 }
