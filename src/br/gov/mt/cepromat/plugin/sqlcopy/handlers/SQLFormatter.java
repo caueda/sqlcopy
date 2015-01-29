@@ -33,18 +33,91 @@ public class SQLFormatter extends AbstractHandler {
 	 */
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindowChecked(event);
-		ITextSelection texto = (ITextSelection) window.getActivePage().getActiveEditor().getEditorSite().getSelectionProvider().getSelection();
-		String content = texto.getText();		
+		ITextSelection content = (ITextSelection) window.getActivePage().getActiveEditor().getEditorSite().getSelectionProvider().getSelection();
+		String texto = content.getText();		
 		Toolkit toolkit = Toolkit.getDefaultToolkit();
 		Clipboard clipboard = toolkit.getSystemClipboard();
-
-		StringSelection textoFormatado = new StringSelection(content + "-Alterado");
+		
+		String sqlFormatado = formatSQL(texto);
+		
+		StringSelection textoFormatado = new StringSelection(sqlFormatado);
 		clipboard.setContents(textoFormatado, null);
 		
-		MessageDialog.openInformation(
-				window.getShell(),
-				"SQLCopy",
-				"Hello, Eclipse world = " + content);
+		if(isBlank(texto)){
+			MessageDialog.openInformation(
+					window.getShell(),
+					"SQLCopy",
+					"Você não selecionou nada \"cabeça\" !");			
+		} else {
+			MessageDialog.openInformation(
+					window.getShell(),
+					"SQLCopy",
+					"SQL Formatado!");
+		}
+		
 		return null;
+	}
+	
+	private String[] startWithKeyWords = new String[]{
+			"select","update","insert","delete","with",
+			"begin","create","drop","truncate","alter",
+			"grant","exec","call"
+	};
+	
+	private String formatSQL(String texto){
+		String formatar = texto.trim();
+		String lower = formatar.toLowerCase();
+		String resultado = "";
+		if(startWith(lower, startWithKeyWords)){
+			String[] linhas = formatar.split("\n");
+			StringBuilder newsql = new StringBuilder();
+			newsql.append("StringBuilder sql = new StringBuilder();\n");
+			for(String linha: linhas){
+				newsql.append("sql.append(\"" + linha.replace("\n", "").replace("\r", "") + "\");\n" );
+			}
+			resultado = newsql.toString();
+		} else if(contains(lower, new String[]{".append","stringbuilder","stringbuffer"})){									
+			resultado = removeJavaStringBuilderPart(formatar);
+		} else {
+			resultado = removeStringPart(formatar);
+		}
+		return resultado;
+	}
+	
+	private boolean startWith(String sql, String[] comparar){
+		for(String comp : comparar){
+			if(sql.startsWith(comp)) return true;
+		}
+		return false;
+	}
+	
+	private boolean contains(String sql, String[] comparar){
+		for(String comp : comparar){
+			if(sql.contains(comp)) return true;
+		}
+		return false;
+	}
+	
+	private boolean isBlank(String value){
+		return (value == null || value.trim().isEmpty());
+	}
+	
+	public String removeJavaStringBuilderPart(String sql) {
+		StringBuilder formatado = new StringBuilder();
+		String[] linhas = sql.split("\n");
+		for(String linha : linhas){
+			//System.out.println(l.replace("sql.append(\"", ""));
+			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");
+			String firstPart = linha.replaceAll("\\s*(.)*\\.append(\\s)*\\((\\s)*\""," ");
+			//System.out.println(firstPart);			
+			formatado.append(firstPart.replaceAll("\"\\s*\\)\\s*;$", " "));
+		}
+		return formatado.toString();
+	}
+	
+	public String removeStringPart(String sql){
+		String resultado = "";
+		
+		return resultado;
 	}
 }
