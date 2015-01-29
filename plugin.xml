@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="SQL Formatter Category"
+            id="br.gov.mt.cepromat.plugin.sqlcopy.commands.category">
+      </category>
+      <command
+            name="Copy code"
+            categoryId="br.gov.mt.cepromat.plugin.sqlcopy.commands.category"
+            id="br.gov.mt.cepromat.plugin.sqlcopy.commands.sampleCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="br.gov.mt.cepromat.plugin.sqlcopy.commands.sampleCommand"
+            class="br.gov.mt.cepromat.plugin.sqlcopy.handlers.SQLFormatter">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="br.gov.mt.cepromat.plugin.sqlcopy.commands.sampleCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            sequence="M1+6"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="SQL Formatter"
+               mnemonic="M"
+               id="br.gov.mt.cepromat.plugin.sqlcopy.menus.sampleMenu">
+            <command
+                  commandId="br.gov.mt.cepromat.plugin.sqlcopy.commands.sampleCommand"
+                  mnemonic="S"
+                  id="br.gov.mt.cepromat.plugin.sqlcopy.menus.sampleCommand">
+            </command>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="toolbar:org.eclipse.ui.main.toolbar?after=additions">
+         <toolbar
+               id="br.gov.mt.cepromat.plugin.sqlcopy.toolbars.sampleToolbar">
+            <command
+                  commandId="br.gov.mt.cepromat.plugin.sqlcopy.commands.sampleCommand"
+                  icon="icons/sample.gif"
+                  tooltip="SQL formatter utility"
+                  id="br.gov.mt.cepromat.plugin.sqlcopy.toolbars.sampleCommand">
+            </command>
+         </toolbar>
+      </menuContribution>
+   </extension>
+
+</plugin>
