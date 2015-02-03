@@ -61,6 +61,11 @@ public class SQLFormatter extends AbstractHandler {
 			"grant","exec","call"
 	};
 	
+	/**
+	 * Método para formatar SQL para Java StringBuilder.
+	 * @param texto
+	 * @return
+	 */
 	private String formatSQL(String texto){
 		String formatar = texto.trim();
 		String lower = formatar.toLowerCase();
