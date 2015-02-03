@@ -86,6 +86,12 @@ public class SQLFormatter extends AbstractHandler {
 		return resultado;
 	}
 	
+	/**
+	 * Método que identifica se é um comando SQL.
+	 * @param sql
+	 * @param comparar
+	 * @return
+	 */
 	private boolean startWith(String sql, String[] comparar){
 		for(String comp : comparar){
 			if(sql.startsWith(comp)) return true;
