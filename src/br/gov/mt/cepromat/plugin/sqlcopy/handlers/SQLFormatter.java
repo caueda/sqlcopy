@@ -129,6 +129,11 @@ public class SQLFormatter extends AbstractHandler {
 		return formatado.toString();
 	}
 	
+	/**
+	 * Documentar...
+	 * @param sql
+	 * @return
+	 */
 	public String removeStringPart(String sql){
 		StringBuilder resultado = new StringBuilder();
 		String[] linhas = sql.split("\n");
