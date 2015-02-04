@@ -129,6 +129,11 @@ public class SQLFormatter extends AbstractHandler {
 		return formatado.toString();
 	}
 	
+	/**
+	 * Método utilizado para remover o comando SQL de uma String Java.
+	 * @param sql
+	 * @return
+	 */
 	public String removeStringPart(String sql){
 		StringBuilder resultado = new StringBuilder();
 		String[] linhas = sql.split("\n");
