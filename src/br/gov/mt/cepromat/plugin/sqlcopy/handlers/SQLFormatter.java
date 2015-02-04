@@ -137,7 +137,7 @@ public class SQLFormatter extends AbstractHandler {
 				linha = linha.replaceAll("\\s*(String)\\s*.+\\s*=\\s*","").replaceAll("new\\s+String\\(","");
 				linha = linha.replaceAll("\\)\\s*;$","");				
 			}
-			linha = linha.replaceAll("\\)\\s*;","").replaceAll("\\s*\\+", "");
+			linha = linha.replaceAll("\\)\\s*;","").replaceAll("\\s*\\+\\s*$", "");
 			linha = linha.replace("\\n","").replace("\\r", "").replace("\n", "").replace("\r", "");
 			linha = linha.replaceAll("\\+*\\s*\"","").replaceAll("\\s*\"\\s*;$", "");
 			resultado.append(linha).append("\n");
