@@ -8,9 +8,17 @@ import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.texteditor.IDocumentProvider;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -45,7 +53,23 @@ public class SQLFormatter extends AbstractHandler {
 					window.getShell(),
 					"SQLCopy",
 					"Você não selecionou nada \"cabeça\" !");			
-		} else {
+		} else {			
+			if(isConvertToJava(texto)){//Realizar a substituição do texto selecionado apenas quando estiver convertendo um SQL para Java.
+				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();			
+				ITextEditor editor = (ITextEditor)part;
+				IDocumentProvider prov = editor.getDocumentProvider();
+		        IDocument doc = prov.getDocument( editor.getEditorInput() );
+		        ISelection sel = editor.getSelectionProvider().getSelection();
+		        
+		        if ( sel instanceof TextSelection ) {
+		            final TextSelection textSel = (TextSelection)sel;
+		            try {
+						doc.replace( textSel.getOffset(), textSel.getLength(), sqlFormatado );
+					} catch (BadLocationException e) {
+						e.printStackTrace();
+					}
+		        }
+			}
 			MessageDialog.openInformation(
 					window.getShell(),
 					"SQLCopy",
@@ -61,6 +85,11 @@ public class SQLFormatter extends AbstractHandler {
 			"grant","exec","call"
 	};
 	
+	private boolean isConvertToJava(String texto){
+		String lower = texto.trim().toLowerCase();
+		return startWith(lower, startWithKeyWords);
+	}
+	
 	/**
 	 * Método para formatar SQL para Java StringBuilder.
 	 * @param texto
@@ -75,7 +104,7 @@ public class SQLFormatter extends AbstractHandler {
 			StringBuilder newsql = new StringBuilder();
 			newsql.append("StringBuilder sql = new StringBuilder();\n");
 			for(String linha: linhas){
-				newsql.append("sql.append(\"" + linha.replace("\n", "").replace("\r", "") + "\");\n" );
+				newsql.append("sql.append(\"" + linha.replace("\n", "").replace("\r", "") + "\\n\");\n" );
 			}
 			resultado = newsql.toString();
 		} else if(contains(lower, new String[]{".append","stringbuilder","stringbuffer"})){									
@@ -115,7 +144,7 @@ public class SQLFormatter extends AbstractHandler {
 		String[] linhas = sql.split("\n");
 		for(String linha : linhas){
 			if(linha.contains("StringBuilder") || linha.contains("StringBuffer")){
-				linha = linha.replaceAll("StringBuilder\\s*\\(", "").replaceAll("\\s*\\)\\s*;$", "");
+				linha = linha.replaceAll("new\\s*StringBuilder\\s*\\(", "").replaceAll("\\s*\\)\\s*;$", "");
 				linha = linha.replaceAll("(StringBuilder|StringBuffer)\\s+.+\\s+=\\s+new\\s+", "");
 				linha = linha.replace("\"","");
 			}
@@ -138,7 +167,9 @@ public class SQLFormatter extends AbstractHandler {
 		StringBuilder resultado = new StringBuilder();
 		String[] linhas = sql.split("\n");
 		for(String linha : linhas){
-			if(linha.contains("String")){
+			if(linha.trim().startsWith("//")){
+				linha = linha.replace("//", "--");
+			} else if(linha.contains("String")){
 				linha = linha.replaceAll("\\s*(String)\\s*.+\\s*=\\s*","").replaceAll("new\\s+String\\(","");
 				linha = linha.replaceAll("\\)\\s*;$","");				
 			}
