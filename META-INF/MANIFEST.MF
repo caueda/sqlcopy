@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: br.gov.mt.cepromat.plugin.sqlcopy.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.jface.text;bundle-version="3.9.0"
+ org.eclipse.jface.text;bundle-version="3.9.0",
+ org.eclipse.ui.editors;bundle-version="3.8.200"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
