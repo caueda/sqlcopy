@@ -148,6 +148,7 @@ public class SQLFormatter extends AbstractHandler {
 				linha = linha.replaceAll("(StringBuilder|StringBuffer)\\s+.+\\s+=\\s+new\\s+", "");
 				linha = linha.replace("\"","");
 			}
+			//comentário
 			//System.out.println(l.replace("sql.append(\"", ""));
 			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");
 			String firstPart = linha.replaceAll("\\s*.+\\.append\\s*\\(\\s*"," ").replaceAll("\"$", "");
