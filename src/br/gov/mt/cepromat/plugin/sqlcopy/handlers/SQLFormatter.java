@@ -139,6 +139,11 @@ public class SQLFormatter extends AbstractHandler {
 		return (value == null || value.trim().isEmpty());
 	}
 	
+	/**
+	 * Remoce StringBuilder part.
+	 * @param sql
+	 * @return
+	 */
 	public String removeJavaStringBuilderPart(String sql) {
 		StringBuilder formatado = new StringBuilder();
 		String[] linhas = sql.split("\n");
@@ -148,7 +153,7 @@ public class SQLFormatter extends AbstractHandler {
 				linha = linha.replaceAll("(StringBuilder|StringBuffer)\\s+.+\\s+=\\s+new\\s+", "");
 				linha = linha.replace("\"","");
 			}
-			//comentário
+			//alterando
 			//System.out.println(l.replace("sql.append(\"", ""));
 			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");
 			String firstPart = linha.replaceAll("\\s*.+\\.append\\s*\\(\\s*"," ").replaceAll("\"$", "");
