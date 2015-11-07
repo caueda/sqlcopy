@@ -52,7 +52,7 @@ public class SQLFormatter extends AbstractHandler {
 			MessageDialog.openInformation(
 					window.getShell(),
 					"SQLCopy",
-					"Você não selecionou nada \"cabeça\" !");			
+					"Você não selecionou nada!");			
 		} else {			
 			if(isConvertToJava(texto)){//Realizar a substituição do texto selecionado apenas quando estiver convertendo um SQL para Java.
 				IEditorPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();			
