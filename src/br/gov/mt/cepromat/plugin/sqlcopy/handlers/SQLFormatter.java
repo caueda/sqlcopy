@@ -92,6 +92,7 @@ public class SQLFormatter extends AbstractHandler {
 	
 	/**
 	 * Método para formatar SQL para Java StringBuilder.
+	 * Comentário teste
 	 * @param texto
 	 * @return
 	 */
