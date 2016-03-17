@@ -10,6 +10,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -19,6 +20,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.texteditor.ITextEditor;
+
+import br.gov.mt.cepromat.plugin.sqlcopy.dialog.CustomMessageDialog;
 
 /**
  * Our sample handler extends AbstractHandler, an IHandler base class.
@@ -32,6 +35,29 @@ public class SQLFormatter extends AbstractHandler {
 	public SQLFormatter() {
 	}
 
+	/**
+	 * Put the SQL wrapped in Java Code idented as it was in the Java Editor.
+	 * @param offset
+	 * @param codeSnippet
+	 * @return
+	 */
+	private String identingCode(int offset, String codeSnippet) {
+		StringBuilder code = new StringBuilder();
+		String[] lineBroken = codeSnippet.split("\n");
+		for(int index=0; index < lineBroken.length; index++) {
+			String line = lineBroken[index];
+			StringBuilder tmpLine = new StringBuilder();
+			if(index != 0) {
+				for(int i=0; i<offset; i++) {
+					tmpLine.append(" ");				
+				}
+			}
+			tmpLine.append(line.replace("\t", "")).append("\n");
+			code.append(tmpLine);
+		}
+		return code.toString();
+	}
+	
 	/**
 	 * the command has been executed, so extract extract the needed information
 	 * from the application context.
@@ -64,16 +90,19 @@ public class SQLFormatter extends AbstractHandler {
 		        if ( sel instanceof TextSelection ) {
 		            final TextSelection textSel = (TextSelection)sel;
 		            try {
-						doc.replace( textSel.getOffset(), textSel.getLength(), sqlFormatado );
+		            	IRegion region = doc.getLineInformationOfOffset(textSel.getOffset());
+						doc.replace( textSel.getOffset(), textSel.getLength(), identingCode(region.getLength(), sqlFormatado));
 					} catch (BadLocationException e) {
 						e.printStackTrace();
 					}
 		        }
-			}
-			MessageDialog.openInformation(
-					window.getShell(),
-					"SQLCopy",
-					"SQL Formatado!");
+			}			
+//			MessageDialog.openInformation(
+//					window.getShell(),
+//					"SQLCopy",
+//					sqlFormatado.toString());
+			CustomMessageDialog dialog = new CustomMessageDialog(window.getShell(), sqlFormatado.toString());
+			dialog.open();
 		}
 		
 		return null;
@@ -178,11 +207,11 @@ public class SQLFormatter extends AbstractHandler {
 				linha = linha.replace("//", "--");
 			} else if(linha.contains("String")){
 				linha = linha.replaceAll("\\s*(String)\\s*.+\\s*=\\s*","").replaceAll("new\\s+String\\(","");
-				linha = linha.replaceAll("\\)\\s*;$","");				
+				linha = linha.replaceAll("\\)\\s*;*$","");				
 			}
-			linha = linha.replaceAll("\\)\\s*;","").replaceAll("\\s*\\+\\s*$", "");
+			linha = linha.replaceAll("\\)\\s*;*","").replaceAll("\\s*\\+\\s*$", "");
 			linha = linha.replace("\\n","").replace("\\r", "").replace("\n", "").replace("\r", "");
-			linha = linha.replaceAll("\\+*\\s*\"","").replaceAll("\\s*\"\\s*;$", "");
+			linha = linha.replaceAll("\\+*\\s*\"","").replaceAll("\\s*\"\\s*;*$", "");
 			resultado.append(linha).append("\n");
 		}
 		return resultado.toString();
