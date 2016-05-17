@@ -10,7 +10,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -49,7 +48,7 @@ public class SQLFormatter extends AbstractHandler {
 			StringBuilder tmpLine = new StringBuilder();
 			if(index != 0) {
 				for(int i=0; i<offset; i++) {
-					tmpLine.append(" ");				
+					tmpLine.append("");				
 				}
 			}
 			tmpLine.append(line.replace("\t", "")).append("\n");
@@ -90,8 +89,9 @@ public class SQLFormatter extends AbstractHandler {
 		        if ( sel instanceof TextSelection ) {
 		            final TextSelection textSel = (TextSelection)sel;
 		            try {
-		            	IRegion region = doc.getLineInformationOfOffset(textSel.getOffset());
-						doc.replace( textSel.getOffset(), textSel.getLength(), identingCode(region.getLength(), sqlFormatado));
+//		            	IRegion region = doc.getLineInformationOfOffset(textSel.getOffset());		            	
+//						doc.replace( textSel.getOffset(), textSel.getLength(), identingCode(region.getLength(), sqlFormatado));
+		            	doc.replace( textSel.getOffset(), textSel.getLength(), sqlFormatado);
 					} catch (BadLocationException e) {
 						e.printStackTrace();
 					}
@@ -178,17 +178,20 @@ public class SQLFormatter extends AbstractHandler {
 		StringBuilder formatado = new StringBuilder();
 		String[] linhas = sql.split("\n");
 		for(String linha : linhas){
+//			if(linha.contains("WHERE TBL.CD_EXERCICIO=")) {
+//				System.out.println(linha);
+//			}
 			if(linha.contains("StringBuilder") || linha.contains("StringBuffer")){
-				linha = linha.replaceAll("new\\s*StringBuilder\\s*\\(", "").replaceAll("\\s*\\)\\s*;$", "");
+				linha = linha.replaceAll("new\\s*StringBuilder\\s*\\(", "").replaceAll("\\);", "");
 				linha = linha.replaceAll("(StringBuilder|StringBuffer)\\s+.+\\s+=\\s+new\\s+", "");
 				linha = linha.replace("\"","");
 			}
 			//alterando
 			//System.out.println(l.replace("sql.append(\"", ""));
-			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");
-			String firstPart = linha.replaceAll("\\s*.+\\.append\\s*\\(\\s*"," ").replaceAll("\"$", "");
+			linha = linha.replace("\\n", "").replace("\\t", "").replace("\n", "").replace("\t", "");			
+			String firstPart = linha.replaceAll("\\w+[^\\)]\\.append\\("," ").replaceAll("\\.*\\).append\\(", " ");
 			//System.out.println(firstPart);			
-			firstPart = removeStringPart(firstPart.replaceAll("\"\\s*\\)\\s*;$", " "));
+			firstPart = removeStringPart(firstPart.replaceAll("\"\\s*\\);", " "));
 			formatado.append(firstPart);
 		}
 		return formatado.toString();
@@ -209,7 +212,8 @@ public class SQLFormatter extends AbstractHandler {
 				linha = linha.replaceAll("\\s*(String)\\s*.+\\s*=\\s*","").replaceAll("new\\s+String\\(","");
 				linha = linha.replaceAll("\\)\\s*;*$","");				
 			}
-			linha = linha.replaceAll("\\)\\s*;*","").replaceAll("\\s*\\+\\s*$", "");
+			linha = linha.replaceAll("\"", "");
+			linha = linha.replaceAll("\\);","").replaceAll("\\s*\\+\\s*$", "");
 			linha = linha.replace("\\n","").replace("\\r", "").replace("\n", "").replace("\r", "");
 			linha = linha.replaceAll("\\+*\\s*\"","").replaceAll("\\s*\"\\s*;*$", "");
 			resultado.append(linha).append("\n");
